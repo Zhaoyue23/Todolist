@@ -1,0 +1,10 @@
+{% extends 'layout.twig' %}
+{% block title %}Edit Task{% endblock %}
+{% block content %}
+<h1>Edit Task</h1>
+<form action="/tasks/update" method="POST">
+    <input type="hidden" name="id" value="{{ task.id }}">
+    <input type="text" name="task" value="{{ task.task|e }}" required>
+    <button type="submit">Update</button>
+</form>
+{% endblock %}

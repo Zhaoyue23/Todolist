@@ -1,0 +1,130 @@
+{% extends 'layout.twig' %}
+
+{% block title %}All Tasks{% endblock %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto py-10">
+
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">All Tasks</h1>
+
+    <form method="GET" action="/tasks" 
+          class="flex flex-col md:flex-row gap-3 mb-6 bg-white p-4 shadow rounded-lg">
+
+        <input 
+            type="text" 
+            name="search" 
+            value="{{ search }}"
+            placeholder="Search..."
+            class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+        >
+
+        <select 
+            name="status"
+            class="px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+        >
+            <option value="">All</option>
+            <option value="pending" {{ status == 'pending' ? 'selected' }}>Pending</option>
+            <option value="completed" {{ status == 'completed' ? 'selected' }}>Completed</option>
+        </select>
+
+        <button 
+            type="submit" 
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+            Search
+        </button>
+    </form>
+
+    <ul class="space-y-3">
+        {% for task in tasks %}
+            <li class="flex justify-between items-center bg-white p-4 shadow rounded-lg">
+
+                <div>
+                    <span class="font-medium text-gray-800">{{ task.task|e }}</span>
+                    <span class="ml-2 text-sm px-2 py-1 rounded-full 
+                        {{ task.is_completed ? 'bg-green-200 text-green-700' : 'bg-yellow-200 text-yellow-700' }}">
+                        {{ task.is_completed ? 'Completed' : 'Pending' }}
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+
+                    <form method="POST" action="/tasks/toggle">
+                        <input type="hidden" name="id" value="{{ task.id }}">
+                        <button 
+                            type="submit"
+                            class="text-sm px-3 py-1 rounded-lg
+                            {{ task.is_completed ? 'bg-gray-300 hover:bg-gray-400' : 'bg-green-500 text-white hover:bg-green-600' }} transition"
+                        >
+                            {{ task.is_completed ? 'Undo' : 'Complete' }}
+                        </button>
+                    </form>
+
+                    <a href="/tasks/show?id={{ task.id }}"
+                       class="text-blue-600 hover:underline text-sm">
+                        View
+                    </a>
+
+                    <a href="/tasks/edit?id={{ task.id }}"
+                       class="text-indigo-600 hover:underline text-sm">
+                        Edit
+                    </a>
+
+                    <form method="POST" action="/tasks/delete"
+                          onsubmit="return confirm('Delete?')">
+                        <input type="hidden" name="id" value="{{ task.id }}">
+                        <button 
+                            type="submit"
+                            class="text-sm px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                        >
+                            Delete
+                        </button>
+                    </form>
+                </div>
+
+            </li>
+        {% else %}
+            <li class="text-gray-500 text-center py-4">No tasks.</li>
+        {% endfor %}
+    </ul>
+
+    <hr class="my-8">
+
+    <form method="POST" action="/tasks/create"
+          class="flex gap-3 bg-white p-4 shadow rounded-lg">
+
+        <input 
+            type="text" 
+            name="task" 
+            placeholder="Add new task" 
+            required
+            class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+        >
+
+        <button 
+            type="submit"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+            Add
+        </button>
+
+    </form>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const input = document.querySelector('input[name="task"]');
+    const limit = 150; // ganti sesuai kebutuhan
+
+    input.addEventListener("input", function () {
+        if (input.value.length > limit) {
+            input.value = input.value.slice(0, limit);
+        }
+    });
+});
+</script>
+
+
+{% endblock %}
